@@ -1,0 +1,10 @@
+.vs
+Build
+Library
+Logs
+obj
+UserSettings
+.vsconfig
+Assembly-CSharp.csproj
+RagdollParty-Server.sln
+Temp

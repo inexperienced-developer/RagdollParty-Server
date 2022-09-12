@@ -26,6 +26,14 @@ namespace InexperiencedDeveloper.Extensions
             }
             return new Vector3(directForce, directMagnitude, collision.impulse.magnitude);
         }
+
+        public static Vector3 GetImpulse(this Collision collision)
+        {
+            Vector3 impulse = collision.impulse;
+            if (Vector3.Dot(impulse, collision.contacts[0].normal) < 0f)
+                return -impulse;
+            return impulse;
+        }
     }
 }
 

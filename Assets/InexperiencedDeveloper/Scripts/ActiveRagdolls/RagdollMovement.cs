@@ -7,29 +7,30 @@ namespace InexperiencedDeveloper.ActiveRagdoll
 {
     public class RagdollMovement : MonoBehaviour
     {
-        private Player player;
-        private Ragdoll ragdoll;
-        public TorsoMuscles torso;
-        public LegMuscles legs;
-        //ADD HANDS
+        private Player Player;
+        private Ragdoll Ragdoll;
+        public TorsoMuscles Torso;
+        public LegMuscles Legs;
+        public ArmMuscles Arms;
 
         public void Init()
         {
-            if (player != null) return;
-            player = GetComponent<Player>();
-            ragdoll = player.Ragdoll;
-            torso = new TorsoMuscles(player, ragdoll, this);
-            legs = new LegMuscles(player, ragdoll, this);
-            //ADD HANDS
+            if (Player != null) return;
+            Player = GetComponent<Player>();
+            Ragdoll = Player.Ragdoll;
+            Torso = new TorsoMuscles(Player, Ragdoll, this);
+            Legs = new LegMuscles(Player, Ragdoll, this);
+            Arms = new ArmMuscles(Player, Ragdoll, this);
         }
 
         public void OnFixedUpdate()
         {
             //ADD HANDS
-            if(torso != null && legs != null)
+            if(Torso != null && Legs != null && Arms != null)
             {
-                torso.OnFixedUpdate();
-                legs.OnFixedUpdate(torso.FeedbackForce);
+                Arms.OnFixedUpdate();
+                Torso.OnFixedUpdate();
+                Legs.OnFixedUpdate(Torso.FeedbackForce);
             }
             else
             {
@@ -57,7 +58,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
         {
             float angle;
             Vector3 axis;
-            (targetRot * Quaternion.Inverse(part.transform.rotation)).ToAngleAxis(out angle, out axis);
+            (targetRot * Quaternion.Inverse(part.Transform.rotation)).ToAngleAxis(out angle, out axis);
             if (angle > 180)
                 angle -= 360;
             if (angle < 180)

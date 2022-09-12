@@ -24,7 +24,7 @@ namespace InexperiencedDeveloper.Core.Controls
         public float WalkSpeed { get; private set; }
         private Vector3 walkLocalDir;
         private Vector3 lastWalkDir;
-        private float unsmoothedWalkSpeed;
+        public float UnsmoothedWalkSpeed;
 
         private List<float> mouseInputsX = new List<float>();
         private List<float> mouseInputsY = new List<float>();
@@ -95,7 +95,7 @@ namespace InexperiencedDeveloper.Core.Controls
             TargetYawAngle = CameraYawAngle;
             Quaternion rot = Quaternion.Euler(0, CameraYawAngle, 0);
             Vector3 dir = rot * walkLocalDir;
-            unsmoothedWalkSpeed = dir.magnitude;
+            UnsmoothedWalkSpeed = dir.magnitude;
             dir = new Vector3(FilterAxisAcceleration(lastWalkDir.x, dir.x), 0f, FilterAxisAcceleration(lastWalkDir.z, dir.z));
             WalkSpeed = dir.magnitude;
             if(WalkSpeed > 0f)

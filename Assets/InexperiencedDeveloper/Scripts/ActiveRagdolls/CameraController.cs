@@ -15,7 +15,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
         public Camera GameCam;
         private Ragdoll ragdoll;
 
-        public Vector3 CloseTargetOffset;
+        public Vector3 CloseTargetOffset = new Vector3(0, 0, -5);
         public float CloseRange;
         public float CloseRangeLookUp;
         public bool IgnoreWalls;
@@ -45,13 +45,19 @@ namespace InexperiencedDeveloper.ActiveRagdoll
 
         private void Start()
         {
-            ragdoll = Player.Ragdoll;
+            GameCam = GetComponent<Camera>();
             //TODO: Water Sensor potentially
             //FOR SETTINGS __ SOMETHIGN TO WORK ON LATER
             if (onCameraSmooth == null)
             {
                 onCameraSmooth = new Action<string>(OnCameraSmooth);
             }
+        }
+
+        public void Init(Player player)
+        {
+            Player = player;
+            ragdoll = Player.Ragdoll;
         }
 
         private static void OnCameraSmooth(string param)
@@ -111,6 +117,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
 
         private void LateUpdate()
         {
+            if (Player == null) return;
             //Change flag for online
             bool flag = false;
             Vector3 targetOffset;
@@ -134,7 +141,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
             //Add adjustments for Menu Cameras
             Quaternion lookRot = Quaternion.Euler(pitch, yaw, 0f);
             Vector3 camForward = lookRot * Vector3.forward;
-            Vector3 targetPos = ((!flag) ? SmoothCamera(ragdoll.Head.transform.position, Time.unscaledDeltaTime) : fixedUpdateSmooth) + targetOffset;
+            Vector3 targetPos = ((!flag) ? SmoothCamera(ragdoll.Head.Transform.position, Time.unscaledDeltaTime) : fixedUpdateSmooth) + targetOffset;
             nearClip *= Mathf.Clamp(GameCam.transform.position.magnitude / 500f, 1f, 2f);
             GameCam.nearClipPlane = nearClip;
             GameCam.fieldOfView = fov;

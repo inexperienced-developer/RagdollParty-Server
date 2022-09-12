@@ -19,13 +19,29 @@ namespace InexperiencedDeveloper.ActiveRagdoll
         public bool Grounded { get; private set; }
         public float Mass { get; private set; }
         public float Weight { get; private set; }
+        public bool IsClimbing { get; private set; }
+
+        public Player GrabbedByPlayer;
 
         public Vector3 TargetDir { get; private set; }
 
         public bool SkipLimiting;
-        private bool jump;
+        public bool Jump;
         private float jumpDelay;
         private float groundDelay;
+        public Vector3 Momentum
+        {
+            get
+            {
+                Vector3 total = Vector3.zero;
+                foreach(Rigidbody rb in Rigidbodies)
+                {
+                    total += rb.velocity * rb.mass;
+                }
+                return total;
+            }
+        }
+
 
         //DELETE FOR HACKING
         public float Speed;
@@ -79,7 +95,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
                     Mass += rb.mass;
                 }
             }
-            Weight = Mass * 9.81f;
+            Weight = Mass * -Physics.gravity.y;
         }
 
         private void FixedUpdate()
@@ -104,7 +120,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
                     if (Controls.Jump && jumpDelay <= 0)
                     {
                         State = PlayerState.Jump;
-                        jump = true;
+                        Jump = true;
                         jumpDelay = 0.5f;
                         groundDelay = 0.2f;
                     }

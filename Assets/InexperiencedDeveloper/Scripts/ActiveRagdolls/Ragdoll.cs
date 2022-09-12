@@ -42,7 +42,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
             GetSegments();
             //Remove collision within the object
             SetupColliders();
-            HandLength = (LeftArm.transform.position - LeftForearm.transform.position).magnitude + (LeftForearm.transform.position - LeftHand.transform.position).magnitude;
+            HandLength = (LeftArm.Transform.position - LeftForearm.Transform.position).magnitude + (LeftForearm.Transform.position - LeftHand.Transform.position).magnitude;
         }
 
         private void GetSegments()
@@ -70,6 +70,24 @@ namespace InexperiencedDeveloper.ActiveRagdoll
             RightFoot = FindSegment(dict, "foot.r");
             DebugLogger.Log($"Found {BodyPartsFound} body parts");
             DebugLogger.LogWarning($"TODO: Collision set up for body parts");
+            SetupHeadComponents(Head);
+            SetupBodyComponents(Chest);
+            SetupBodyComponents(Waist);
+            SetupBodyComponents(Hips);
+            SetupLimbComponents(LeftArm);
+            SetupLimbComponents(LeftForearm);
+            SetupLimbComponents(LeftThigh);
+            SetupLimbComponents(LeftLeg);
+            SetupLimbComponents(RightArm);
+            SetupLimbComponents(RightForearm);
+            SetupLimbComponents(RightThigh);
+            SetupLimbComponents(RightLeg);
+            SetupFootComponents(LeftFoot);
+            SetupFootComponents(RightFoot);
+            SetupHandComponents(LeftHand);
+            SetupHandComponents(RightHand);
+            LeftHand.Sensor.OtherSide = RightHand.Sensor;
+            RightHand.Sensor.OtherSide = LeftHand.Sensor;
             AddAntiStretch(LeftHand, Chest);
             Debug.LogWarning("Added AntiStretch left Hand");
             AddAntiStretch(RightHand, Chest);
@@ -87,7 +105,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
             joint.xMotion = configurableJointMotion;
             joint.linearLimit = new SoftJointLimit
             {
-                limit = (seg1.transform.position - seg2.transform.position).magnitude
+                limit = (seg1.Transform.position - seg2.Transform.position).magnitude
             };
             joint.autoConfigureConnectedAnchor = false;
             joint.anchor = Vector3.zero;
@@ -100,7 +118,7 @@ namespace InexperiencedDeveloper.ActiveRagdoll
             Ball = InitializeSegment(ballTransform);
             SpringJoint spring = Ball.Rigidbody.GetComponent<SpringJoint>();
             spring.autoConfigureConnectedAnchor = false;
-            spring.connectedAnchor = Hips.transform.InverseTransformPoint(transform.position + Vector3.up * ((Ball.collider as SphereCollider).radius + spring.maxDistance));
+            spring.connectedAnchor = Hips.Transform.InverseTransformPoint(transform.position + Vector3.up * ((Ball.Collider as SphereCollider).radius + spring.maxDistance));
             spring.connectedBody = Hips.Rigidbody;
             IgnoreBallCollision();
         }
@@ -113,72 +131,94 @@ namespace InexperiencedDeveloper.ActiveRagdoll
         private BodySegment InitializeSegment(Transform t)
         {
             BodySegment segment = new();
-            segment.transform = t;
-            segment.collider = t.GetComponent<Collider>();
+            segment.Transform = t;
+            segment.Collider = t.GetComponent<Collider>();
             segment.Rigidbody = t.GetComponent<Rigidbody>();
-            segment.startRot = t.localRotation;
+            segment.StartRot = t.localRotation;
 
             //FOR DEBUG ONLY
-            if(segment.collider == null) DebugLogger.LogError($"{t.name} is missing Collider", true);
+            if(segment.Collider == null) DebugLogger.LogError($"{t.name} is missing Collider", true);
             if(segment.Rigidbody == null) DebugLogger.LogError($"{t.name} is missing Rigidbody", true);
             BodyPartsFound++;
             print(t.name);
 
             return segment;
         }
+        
+        private void SetupHeadComponents(BodySegment segment)
+        {
+            segment.Sensor = segment.Transform.gameObject.AddComponent<CollisionSensor>();
+        }
+        private void SetupBodyComponents(BodySegment segment)
+        {
+            segment.Sensor = segment.Transform.gameObject.AddComponent<CollisionSensor>();
+        }
+        private void SetupLimbComponents(BodySegment segment)
+        {
+            segment.Sensor = segment.Transform.gameObject.AddComponent<CollisionSensor>();
+        }
+        private void SetupHandComponents(BodySegment segment)
+        {
+            segment.Sensor = segment.Transform.gameObject.AddComponent<CollisionSensor>();
+        }
+        private void SetupFootComponents(BodySegment segment)
+        {
+            segment.Sensor = segment.Transform.gameObject.AddComponent<CollisionSensor>();
+            segment.Sensor.GroundCheck = true;
+        }
 
         private void SetupColliders()
         {
             //Chest
-            Physics.IgnoreCollision(Chest.collider, Head.collider);
-            Physics.IgnoreCollision(Chest.collider, LeftArm.collider);
-            Physics.IgnoreCollision(Chest.collider, LeftForearm.collider);
-            Physics.IgnoreCollision(Chest.collider, RightArm.collider);
-            Physics.IgnoreCollision(Chest.collider, RightForearm.collider);
-            Physics.IgnoreCollision(Chest.collider, Waist.collider);
+            Physics.IgnoreCollision(Chest.Collider, Head.Collider);
+            Physics.IgnoreCollision(Chest.Collider, LeftArm.Collider);
+            Physics.IgnoreCollision(Chest.Collider, LeftForearm.Collider);
+            Physics.IgnoreCollision(Chest.Collider, RightArm.Collider);
+            Physics.IgnoreCollision(Chest.Collider, RightForearm.Collider);
+            Physics.IgnoreCollision(Chest.Collider, Waist.Collider);
 
             //Hips
-            Physics.IgnoreCollision(Hips.collider, Chest.collider);
-            Physics.IgnoreCollision(Hips.collider, Waist.collider);
-            Physics.IgnoreCollision(Hips.collider, LeftThigh.collider);
-            Physics.IgnoreCollision(Hips.collider, LeftLeg.collider);
-            Physics.IgnoreCollision(Hips.collider, LeftFoot.collider);
-            Physics.IgnoreCollision(Hips.collider, RightThigh.collider);
-            Physics.IgnoreCollision(Hips.collider, RightLeg.collider);
-            Physics.IgnoreCollision(Hips.collider, RightFoot.collider);
+            Physics.IgnoreCollision(Hips.Collider, Chest.Collider);
+            Physics.IgnoreCollision(Hips.Collider, Waist.Collider);
+            Physics.IgnoreCollision(Hips.Collider, LeftThigh.Collider);
+            Physics.IgnoreCollision(Hips.Collider, LeftLeg.Collider);
+            Physics.IgnoreCollision(Hips.Collider, LeftFoot.Collider);
+            Physics.IgnoreCollision(Hips.Collider, RightThigh.Collider);
+            Physics.IgnoreCollision(Hips.Collider, RightLeg.Collider);
+            Physics.IgnoreCollision(Hips.Collider, RightFoot.Collider);
 
             //Left Arm
-            Physics.IgnoreCollision(LeftArm.collider, LeftForearm.collider);
-            Physics.IgnoreCollision(LeftArm.collider, LeftHand.collider);
-            Physics.IgnoreCollision(LeftForearm.collider, LeftHand.collider);
+            Physics.IgnoreCollision(LeftArm.Collider, LeftForearm.Collider);
+            Physics.IgnoreCollision(LeftArm.Collider, LeftHand.Collider);
+            Physics.IgnoreCollision(LeftForearm.Collider, LeftHand.Collider);
             
             //Right Arm
-            Physics.IgnoreCollision(RightArm.collider, RightForearm.collider);
-            Physics.IgnoreCollision(RightArm.collider, RightHand.collider);
-            Physics.IgnoreCollision(RightForearm.collider, RightHand.collider);
+            Physics.IgnoreCollision(RightArm.Collider, RightForearm.Collider);
+            Physics.IgnoreCollision(RightArm.Collider, RightHand.Collider);
+            Physics.IgnoreCollision(RightForearm.Collider, RightHand.Collider);
 
             //Left Leg
-            Physics.IgnoreCollision(LeftThigh.collider, LeftLeg.collider);
+            Physics.IgnoreCollision(LeftThigh.Collider, LeftLeg.Collider);
 
             //Right Leg
-            Physics.IgnoreCollision(RightThigh.collider, RightLeg.collider);
+            Physics.IgnoreCollision(RightThigh.Collider, RightLeg.Collider);
         }
 
         private void IgnoreBallCollision()
         {
-            Physics.IgnoreCollision(Ball.collider, RightFoot.collider);
-            Physics.IgnoreCollision(Ball.collider, RightLeg.collider);
-            Physics.IgnoreCollision(Ball.collider, LeftFoot.collider);
-            Physics.IgnoreCollision(Ball.collider, LeftLeg.collider);
-            Physics.IgnoreCollision(Ball.collider, RightHand.collider);
-            Physics.IgnoreCollision(Ball.collider, RightForearm.collider);
-            Physics.IgnoreCollision(Ball.collider, RightArm.collider);
-            Physics.IgnoreCollision(Ball.collider, LeftArm.collider);
-            Physics.IgnoreCollision(Ball.collider, LeftForearm.collider);
-            Physics.IgnoreCollision(Ball.collider, LeftHand.collider);
-            Physics.IgnoreCollision(Ball.collider, Hips.collider);
-            Physics.IgnoreCollision(Ball.collider, Chest.collider);
-            Physics.IgnoreCollision(Ball.collider, Waist.collider);
+            Physics.IgnoreCollision(Ball.Collider, RightFoot.Collider);
+            Physics.IgnoreCollision(Ball.Collider, RightLeg.Collider);
+            Physics.IgnoreCollision(Ball.Collider, LeftFoot.Collider);
+            Physics.IgnoreCollision(Ball.Collider, LeftLeg.Collider);
+            Physics.IgnoreCollision(Ball.Collider, RightHand.Collider);
+            Physics.IgnoreCollision(Ball.Collider, RightForearm.Collider);
+            Physics.IgnoreCollision(Ball.Collider, RightArm.Collider);
+            Physics.IgnoreCollision(Ball.Collider, LeftArm.Collider);
+            Physics.IgnoreCollision(Ball.Collider, LeftForearm.Collider);
+            Physics.IgnoreCollision(Ball.Collider, LeftHand.Collider);
+            Physics.IgnoreCollision(Ball.Collider, Hips.Collider);
+            Physics.IgnoreCollision(Ball.Collider, Chest.Collider);
+            Physics.IgnoreCollision(Ball.Collider, Waist.Collider);
         }
     }
 }

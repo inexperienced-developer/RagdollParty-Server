@@ -6,13 +6,13 @@ namespace InexperiencedDeveloper.ActiveRagdoll
 {
     public class BodySegment
     {
-        public Transform transform;
-        public Collider collider;
+        public Transform Transform;
+        public Collider Collider;
         public Rigidbody Rigidbody;
-        public CollisionSensor sensor;
-        public Quaternion startRot;
-        public Transform skeleton;
-        public BodySegment parent;
+        public CollisionSensor Sensor;
+        public Quaternion StartRot;
+        public Transform Skele;
+        public BodySegment Parent;
     }
 }
 
